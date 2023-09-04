@@ -10,6 +10,7 @@ import os
 from typing import List
 import torch
 import torch.utils.checkpoint as checkpoint
+import copy
 
 from .utils import *
 from ..modules.locon import LoConModule
@@ -344,12 +345,19 @@ class LycorisNetwork(torch.nn.Module):
             lora.multiplier = self.multiplier
     
     def load_weights(self, file):
-        if os.path.splitext(file)[1] == '.safetensors':
-            from safetensors.torch import load_file, safe_open
-            self.weights_sd = load_file(file)
-        else:
-            self.weights_sd = torch.load(file, map_location='cpu')
+        if os.path.splitext(file)[1] == ".safetensors":
+            from safetensors.torch import load_file
 
+            weights_sd = load_file(file)
+        else:
+            weights_sd = torch.load(file, map_location="cpu")
+
+        info = copy.deepcopy(weights_sd)
+        for key in list(info.keys()):
+            if type(info[key]) == torch.Tensor:
+                info[key] = info[key].to(dtype)
+        return info
+        
     def apply_to(self, text_encoder, unet, apply_text_encoder=None, apply_unet=None):
         if self.weights_sd:
             weights_has_text_encoder = weights_has_unet = False
