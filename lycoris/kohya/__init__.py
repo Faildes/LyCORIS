@@ -351,9 +351,8 @@ class LycorisNetwork(torch.nn.Module):
             weights_sd = load_file(file)
         else:
             weights_sd = torch.load(file, map_location="cpu")
-
-        info = self.load_state_dict(weights_sd, False)
-        return info
+            
+        return weights_sd
         
     def apply_to(self, text_encoder, unet, apply_text_encoder=None, apply_unet=None):
         if self.weights_sd:
