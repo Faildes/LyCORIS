@@ -345,14 +345,15 @@ class LycorisNetwork(torch.nn.Module):
             lora.multiplier = self.multiplier
     
     def load_weights(self, file):
-        if os.path.splitext(file)[1] == ".safetensors":
+        basenames = os.path.splitext(os.path.basename(file))
+        if basenames[1] == ".safetensors":
             from safetensors.torch import load_file
 
             weights_sd = load_file(file)
         else:
             weights_sd = torch.load(file, map_location="cpu")
             
-        return weights_sd
+        return basenames[0]
         
     def apply_to(self, text_encoder, unet, apply_text_encoder=None, apply_unet=None):
         if self.weights_sd:
