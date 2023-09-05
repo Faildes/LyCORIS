@@ -352,10 +352,7 @@ class LycorisNetwork(torch.nn.Module):
         else:
             weights_sd = torch.load(file, map_location="cpu")
 
-        info = copy.deepcopy(weights_sd)
-        for key in list(info.keys()):
-            if type(info[key]) == torch.Tensor:
-                info[key] = info[key].to(dtype)
+        info = self.load_state_dict(weights_sd, False)
         return info
         
     def apply_to(self, text_encoder, unet, apply_text_encoder=None, apply_unet=None):
